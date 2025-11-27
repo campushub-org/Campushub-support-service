@@ -32,12 +32,21 @@ Le service sera accessible sur le port défini dans sa configuration (par défau
 
 #### Construire et exécuter avec Docker Compose
 
-```bash
-# Depuis le répertoire campushub-deployment/
-docker compose build campushub-support-service
-docker compose up -d campushub-support-service
-```
+Pour que Docker puisse construire l'image correctement, le fichier JAR de l'application doit être construit *au préalable* sur votre machine locale.
 
+1.  **Construire le JAR de l'application :**
+    ```bash
+    cd campushub-deployment/campushub-support-service
+    ./mvnw install -DskipTests
+    ```
+    Cette commande va compiler le code et générer le fichier `campushub-support-service-0.0.1-SNAPSHOT.jar` dans le répertoire `target/`.
+
+2.  **Construire l'image Docker et démarrer le service :**
+    ```bash
+    # Depuis le répertoire campushub-deployment/
+    docker compose build campushub-support-service
+    docker compose up -d campushub-support-service
+    ```
 ### Endpoints de l'API
 
 **Note importante :** Les exemples ci-dessous supposent que le `campushub-gateway-service` est en cours d'exécution sur `http://localhost:8080` et qu'il route les requêtes avec le préfixe `/campushub-support-service` vers ce service.
