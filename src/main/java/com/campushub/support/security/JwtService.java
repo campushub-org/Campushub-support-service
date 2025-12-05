@@ -3,6 +3,7 @@ package com.campushub.support.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.xml.bind.DatatypeConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,7 +23,8 @@ public class JwtService {
     private String secret;
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+        byte[] secretBytes = DatatypeConverter.parseHexBinary(secret);
+        return Keys.hmacShaKeyFor(secretBytes);
     }
 
     public boolean validateToken(String authToken) {
@@ -61,5 +63,14 @@ public class JwtService {
         }
         // Fallback or handle other types if necessary
         return Collections.emptyList();
+    }
+
+    public Long getIdFromJWT(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.get("id", Long.class); // Assuming the ID is stored as a Long
     }
 }

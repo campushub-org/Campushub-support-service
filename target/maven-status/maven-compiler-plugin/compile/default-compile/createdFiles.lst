@@ -1,15 +1,13 @@
-com/campushub/support/client/UserServiceClient.class
 com/campushub/support/security/JwtService.class
-com/campushub/support/client/UserServiceClient$UserResponseDto.class
 com/campushub/support/service/SupportCoursService.class
 com/campushub/support/service/SupportCoursServiceImpl.class
 com/campushub/support/controller/SupportCoursController.class
 com/campushub/support/security/JwtAuthenticationFilter.class
+com/campushub/support/security/CustomUserDetails.class
 com/campushub/support/security/SecurityConfig.class
 com/campushub/support/CampushubSupportServiceApplication.class
 com/campushub/support/dto/CreateSupportCoursDto.class
 com/campushub/support/model/Statut.class
-com/campushub/support/security/SupportSecurity.class
 com/campushub/support/model/SupportCours.class
 com/campushub/support/repository/SupportCoursRepository.class
 com/campushub/support/dto/SupportCoursDto.class

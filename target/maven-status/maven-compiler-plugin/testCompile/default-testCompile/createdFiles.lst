@@ -1,1 +1,3 @@
 com/campushub/support/SupportCoursIntegrationTest.class
+com/campushub/support/security/WithMockCustomUser.class
+com/campushub/support/security/WithMockCustomUserFactory.class

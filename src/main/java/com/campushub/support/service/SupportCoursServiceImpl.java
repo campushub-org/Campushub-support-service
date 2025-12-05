@@ -1,13 +1,13 @@
 package com.campushub.support.service;
 
-import com.campushub.support.client.UserServiceClient;
-import com.campushub.support.model.Statut;
+import com.campushub.support.security.CustomUserDetails;
+import com.campushub.support.model.Statut; // Added import
 import com.campushub.support.model.SupportCours;
 import com.campushub.support.repository.SupportCoursRepository;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,26 +17,33 @@ import java.util.Optional;
 @Service
 public class SupportCoursServiceImpl implements SupportCoursService {
 
+    private static final Logger logger = LoggerFactory.getLogger(SupportCoursServiceImpl.class);
+
     private final SupportCoursRepository supportCoursRepository;
-    private final RabbitTemplate rabbitTemplate;
-    private final UserServiceClient userServiceClient;
 
     @Autowired
-    public SupportCoursServiceImpl(SupportCoursRepository supportCoursRepository, RabbitTemplate rabbitTemplate, UserServiceClient userServiceClient) {
+    public SupportCoursServiceImpl(SupportCoursRepository supportCoursRepository) {
         this.supportCoursRepository = supportCoursRepository;
-        this.rabbitTemplate = rabbitTemplate;
-        this.userServiceClient = userServiceClient;
     }
 
     @Override
     public SupportCours createSupport(String titre, String description, String fichierUrl) {
-        String authenticatedUsername = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        Long enseignantId = userServiceClient.getUserIdByUsername(authenticatedUsername);
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long enseignantId;
 
-        if (enseignantId == null) {
-            throw new RuntimeException("Authenticated user ID not found or invalid.");
+        if (principal instanceof CustomUserDetails) {
+            enseignantId = ((CustomUserDetails) principal).getId();
+            logger.info("Authenticated user authorities: {}", ((CustomUserDetails) principal).getAuthorities());
+        } else {
+            logger.warn("Principal is not CustomUserDetails: {}", principal.getClass().getName());
+            // Fallback for tests or other authentication types
+            throw new RuntimeException("Authenticated user is not of type CustomUserDetails.");
         }
 
+        if (enseignantId == null) {
+            throw new RuntimeException("Authenticated user ID not found.");
+        }
+        
         SupportCours support = new SupportCours();
         support.setTitre(titre);
         support.setDescription(description);
@@ -81,8 +88,6 @@ public class SupportCoursServiceImpl implements SupportCoursService {
         SupportCours support = supportCoursRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Support de cours non trouvé"));
         support.setStatut(Statut.SOUMIS);
-        // Envoyer un événement pour notifier le service de workflow/validation
-        rabbitTemplate.convertAndSend("support.submitted", support.getId());
         return supportCoursRepository.save(support);
     }
 
@@ -93,8 +98,6 @@ public class SupportCoursServiceImpl implements SupportCoursService {
         support.setStatut(Statut.VALIDÉ);
         support.setDateValidation(LocalDate.now());
         support.setRemarqueDoyen(remarque);
-        // Envoyer un événement
-        rabbitTemplate.convertAndSend("support.validated", support.getId());
         return supportCoursRepository.save(support);
     }
 
@@ -104,8 +107,6 @@ public class SupportCoursServiceImpl implements SupportCoursService {
                 .orElseThrow(() -> new RuntimeException("Support de cours non trouvé"));
         support.setStatut(Statut.REJETÉ);
         support.setRemarqueDoyen(remarque);
-        // Envoyer un événement
-        rabbitTemplate.convertAndSend("support.rejected", support.getId());
         return supportCoursRepository.save(support);
     }
 

@@ -38,15 +38,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 
                 // For a resource server, we primarily care about the authorities/roles.
                 // We don't need to load the full UserDetails from a DB here.
-                // Create a simple UserDetails object from the token's claims.
-                UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                // Create a CustomUserDetails object from the token's claims.
+                Long userId = jwtService.getIdFromJWT(jwt);
+                UserDetails userDetails = new CustomUserDetails(
+                        userId,
                         username,
                         "", // Password is not needed/available in resource server JWT validation
                         jwtService.getAuthoritiesFromJWT(jwt)
                 );
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
+                        userDetails, jwt, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
