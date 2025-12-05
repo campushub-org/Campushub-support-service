@@ -69,7 +69,7 @@ public class SupportCoursController {
 
     // Endpoint for a teacher to get their own supports
     @GetMapping("/enseignant/{enseignantId}")
-    @PreAuthorize("@supportSecurity.isUser(authentication, #enseignantId) or hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<SupportCoursDto> getSupportsByEnseignant(@PathVariable Long enseignantId) {
         return supportCoursService.getSupportsByEnseignant(enseignantId).stream()
                 .map(this::convertToDto)
@@ -87,7 +87,7 @@ public class SupportCoursController {
 
     // Endpoint for a teacher to submit their draft
     @PostMapping("/{id}/submit")
-    @PreAuthorize("@supportSecurity.isOwner(authentication, #id) and hasAuthority('ROLE_TEACHER')")
+    @PreAuthorize("hasAuthority('ROLE_TEACHER')")
     public ResponseEntity<SupportCoursDto> submitSupport(@PathVariable Long id) {
         return ResponseEntity.ok(convertToDto(supportCoursService.submitSupport(id)));
     }
@@ -108,7 +108,7 @@ public class SupportCoursController {
     
     // Endpoint for a teacher to delete a draft
     @DeleteMapping("/{id}")
-    @PreAuthorize("@supportSecurity.isOwner(authentication, #id) or hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteSupport(@PathVariable Long id) {
         // Business logic should ensure only drafts can be deleted, for example
         supportCoursService.deleteSupport(id);

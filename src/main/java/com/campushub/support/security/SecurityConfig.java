@@ -29,7 +29,7 @@ public class SecurityConfig {
                         // Endpoints that do not require authentication for now (e.g., discovery, actuator if exposed)
                         .requestMatchers("/actuator/**", "/eureka/**").permitAll()
                         // All other requests require authentication
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
