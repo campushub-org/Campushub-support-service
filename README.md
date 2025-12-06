@@ -4,7 +4,7 @@ Ce service est responsable de la gestion du cycle de vie des supports de cours (
 
 ### Fonctionnalités
 
-*   **Gestion des supports de cours** : Permet aux enseignants de créer, mettre à jour et supprimer leurs supports de cours (à l'état de brouillon).
+*   **Gestion des supports de cours** : Permet aux enseignants de créer, mettre à jour et supprimer leurs supports de cours (à l'état de brouillon). Inclut désormais les attributs `niveau` (L1, L2, L3, M1, M2) et `matiere`.
 *   **Workflow de validation** : Gère le cycle de vie d'un support (brouillon, soumis, validé, rejeté) via des endpoints dédiés.
 *   **Communication Inter-Services** : 
     *   Communique avec `campushub-user-service` pour valider l'identité des enseignants.
@@ -58,7 +58,7 @@ Pour que Docker puisse construire l'image correctement, le fichier JAR de l'appl
 - **Méthode :** `POST`
 - **Path :** `/api/supports`
 - **Permissions :** `ROLE_TEACHER`
-- **Description :** Crée un nouveau support de cours. L'ID de l'enseignant est automatiquement déduit du token d'authentification.
+- **Description :** Crée un nouveau support de cours. L'ID de l'enseignant est automatiquement déduit du token d'authentification. Inclut désormais les champs `niveau` et `matiere`.
 
 **Exemple `curl`:**
 ```bash
@@ -70,7 +70,9 @@ curl --location 'http://localhost:8080/campushub-support-service/api/supports' \
 {
     "titre": "Introduction à la Physique Quantique",
     "description": "Chapitre 1 du cours de Physique Moderne.",
-    "fichierUrl": "http://example.com/cours/physique_chap1.pdf"
+    "fichierUrl": "http://example.com/cours/physique_chap1.pdf",
+    "niveau": "M1",
+    "matiere": "Physique Quantique"
 }
 ```
 
@@ -154,30 +156,33 @@ curl --location --request DELETE 'http://localhost:8080/campushub-support-servic
 --header 'Authorization: Bearer YOUR_TEACHER_JWT_TOKEN'
 ```
 
- #### 4. Lister tous les supports de cours (Utilisateur Authentifié)                                                           
-- **Méthode :** `GET`                                                                                                         
-- **Path :** `/api/supports`                                                                                                  
-- **Permissions :** `isAuthenticated()`                                                                                       
-- **Description :** Récupère la liste de tous les supports de cours (probablement seulement les `VALIDÉ` dans une future version, mais pour l'instant tous).                                                                                                                                                                                                                            
-  **Exemple `curl`:**                                                                                                           
-   ```bash                                                                                                                       
- # Remplacez YOUR_JWT_TOKEN par un token valide (étudiant, enseignant, etc.)                                                   
- curl --location 'http://localhost:8080/campushub-support-service/api/supports' \                                              
- --header 'Authorization: Bearer YOUR_JWT_TOKEN'                                                                               
- ```                                                                                                                           
-                                                                                                                               
-                                                                                                                               
- #### 5. Récupérer un support de cours par ID (Utilisateur Authentifié)                                                        
-                                                                                                                               
- - **Méthode :** `GET`                                                                                                         
- - **Path :** `/api/supports/{id}`                                                                                             
- - **Permissions :** `isAuthenticated()`                                                                                       
- - **Description :** Récupère un support de cours spécifique par son identifiant.                                              
-                                                                                                                               
- **Exemple `curl`:**                                                                                                           
- ```bash                                                                                                                       
- # Remplacez YOUR_JWT_TOKEN par un token valide                                                                                
- curl --location 'http://localhost:8080/campushub-support-service/api/supports/1' \                                            
- --header 'Authorization: Bearer YOUR_JWT_TOKEN'                                                                               
- ```                                                                                                                           
- ```bash     
+---
+
+#### 7. Lister tous les supports de cours (Utilisateur Authentifié)
+
+- **Méthode :** `GET`
+- **Path :** `/api/supports`
+- **Permissions :** `isAuthenticated()`
+- **Description :** Récupère la liste de tous les supports de cours (probablement seulement les `VALIDÉ` dans une future version, mais pour l'instant tous).
+
+**Exemple `curl`:**
+```bash
+# Remplacez YOUR_JWT_TOKEN par un token valide (étudiant, enseignant, etc.)
+curl --location 'http://localhost:8080/campushub-support-service/api/supports' \
+--header 'Authorization: Bearer YOUR_JWT_TOKEN'
+```
+
+---
+
+#### 8. Récupérer un support de cours par ID (Utilisateur Authentifié)
+
+- **Méthode :** `GET`
+- **Path :** `/api/supports/{id}`
+- **Permissions :** `isAuthenticated()`
+
+**Exemple `curl`:**
+```bash
+# Remplacez YOUR_JWT_TOKEN par un token valide
+curl --location 'http://localhost:8080/campushub-support-service/api/supports/1' \
+--header 'Authorization: Bearer YOUR_JWT_TOKEN'
+```
