@@ -1,5 +1,6 @@
 package com.campushub.support.service;
-import com.campushub.support.security.CustomUserDetails;    
+import com.campushub.support.dto.SupportNotification;
+import com.campushub.support.security.CustomUserDetails;
 import com.campushub.support.model.Niveau;
 import com.campushub.support.model.Statut; // Import mis à jour
 import com.campushub.support.model.SupportCours;
@@ -20,10 +21,12 @@ public class SupportCoursServiceImpl implements SupportCoursService {
     private static final Logger logger = LoggerFactory.getLogger(SupportCoursServiceImpl.class);
 
     private final SupportCoursRepository supportCoursRepository;
+    private final NotificationProducer notificationProducer;
 
     @Autowired
-    public SupportCoursServiceImpl(SupportCoursRepository supportCoursRepository) {
+    public SupportCoursServiceImpl(SupportCoursRepository supportCoursRepository, NotificationProducer notificationProducer) {
         this.supportCoursRepository = supportCoursRepository;
+        this.notificationProducer = notificationProducer;
     }
 
     @Override
@@ -51,7 +54,20 @@ public class SupportCoursServiceImpl implements SupportCoursService {
         support.setNiveau(niveau);
         support.setMatiere(matiere);
         support.setEnseignantId(enseignantId); // Set from authenticated user
-        return supportCoursRepository.save(support);
+        SupportCours savedSupport = supportCoursRepository.save(support);
+
+        // Send notification
+        SupportNotification notification = new SupportNotification(
+                savedSupport.getId(),
+                savedSupport.getTitre(),
+                savedSupport.getEnseignantId(),
+                savedSupport.getStatut(),
+                savedSupport.getNiveau(),
+                savedSupport.getMatiere()
+        );
+        notificationProducer.sendNotification(notification);
+
+        return savedSupport;
     }
 
     @Override
@@ -90,7 +106,20 @@ public class SupportCoursServiceImpl implements SupportCoursService {
         SupportCours support = supportCoursRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Support de cours non trouvé"));
         support.setStatut(Statut.SOUMIS);
-        return supportCoursRepository.save(support);
+        SupportCours savedSupport = supportCoursRepository.save(support);
+
+        // Send notification
+        SupportNotification notification = new SupportNotification(
+                savedSupport.getId(),
+                savedSupport.getTitre(),
+                savedSupport.getEnseignantId(),
+                savedSupport.getStatut(),
+                savedSupport.getNiveau(),
+                savedSupport.getMatiere()
+        );
+        notificationProducer.sendNotification(notification);
+
+        return savedSupport;
     }
 
     @Override
