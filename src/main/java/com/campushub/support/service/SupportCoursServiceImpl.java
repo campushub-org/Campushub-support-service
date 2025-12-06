@@ -1,7 +1,7 @@
 package com.campushub.support.service;
-
-import com.campushub.support.security.CustomUserDetails;
-import com.campushub.support.model.Statut; // Added import
+import com.campushub.support.security.CustomUserDetails;    
+import com.campushub.support.model.Niveau;
+import com.campushub.support.model.Statut; // Import mis à jour
 import com.campushub.support.model.SupportCours;
 import com.campushub.support.repository.SupportCoursRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class SupportCoursServiceImpl implements SupportCoursService {
     }
 
     @Override
-    public SupportCours createSupport(String titre, String description, String fichierUrl) {
+    public SupportCours createSupport(String titre, String description, String fichierUrl, Niveau niveau, String matiere) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long enseignantId;
 
@@ -48,6 +48,8 @@ public class SupportCoursServiceImpl implements SupportCoursService {
         support.setTitre(titre);
         support.setDescription(description);
         support.setFichierUrl(fichierUrl);
+        support.setNiveau(niveau);
+        support.setMatiere(matiere);
         support.setEnseignantId(enseignantId); // Set from authenticated user
         return supportCoursRepository.save(support);
     }

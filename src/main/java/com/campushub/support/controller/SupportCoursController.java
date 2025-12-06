@@ -29,6 +29,8 @@ public class SupportCoursController {
         dto.setTitre(supportCours.getTitre());
         dto.setDescription(supportCours.getDescription());
         dto.setFichierUrl(supportCours.getFichierUrl());
+        dto.setNiveau(supportCours.getNiveau());
+        dto.setMatiere(supportCours.getMatiere());
         dto.setEnseignantId(supportCours.getEnseignantId());
         dto.setDateDepot(supportCours.getDateDepot());
         dto.setStatut(supportCours.getStatut());
@@ -44,7 +46,9 @@ public class SupportCoursController {
         SupportCours createdSupport = supportCoursService.createSupport(
                 createDto.getTitre(),
                 createDto.getDescription(),
-                createDto.getFichierUrl()
+                createDto.getFichierUrl(),
+                createDto.getNiveau(),
+                createDto.getMatiere()
         );
         return new ResponseEntity<>(convertToDto(createdSupport), HttpStatus.CREATED);
     }

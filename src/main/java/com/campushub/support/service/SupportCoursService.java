@@ -1,13 +1,14 @@
 package com.campushub.support.service;
 
-import com.campushub.support.model.SupportCours;
+import com.campushub.support.model.SupportCours; 
+import com.campushub.support.model.Niveau;
 import com.campushub.support.model.Statut;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface SupportCoursService {
-    SupportCours createSupport(String titre, String description, String fichierUrl);
+    SupportCours createSupport(String titre, String description, String fichierUrl, Niveau niveau, String matiere);
     Optional<SupportCours> getSupportById(Long id);
     List<SupportCours> getAllSupports();
     List<SupportCours> getSupportsByEnseignant(Long enseignantId);

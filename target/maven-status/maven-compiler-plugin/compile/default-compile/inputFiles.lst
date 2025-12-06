@@ -8,6 +8,7 @@
 /home/jordan43/Bureau/projet/java/campushub-org/campushub-deployment/campushub-support-service/src/main/java/com/campushub/support/repository/SupportCoursRepository.java
 /home/jordan43/Bureau/projet/java/campushub-org/campushub-deployment/campushub-support-service/src/main/java/com/campushub/support/CampushubSupportServiceApplication.java
 /home/jordan43/Bureau/projet/java/campushub-org/campushub-deployment/campushub-support-service/src/main/java/com/campushub/support/service/SupportCoursService.java
+/home/jordan43/Bureau/projet/java/campushub-org/campushub-deployment/campushub-support-service/src/main/java/com/campushub/support/model/Niveau.java
 /home/jordan43/Bureau/projet/java/campushub-org/campushub-deployment/campushub-support-service/src/main/java/com/campushub/support/controller/SupportCoursController.java
 /home/jordan43/Bureau/projet/java/campushub-org/campushub-deployment/campushub-support-service/src/main/java/com/campushub/support/model/SupportCours.java
 /home/jordan43/Bureau/projet/java/campushub-org/campushub-deployment/campushub-support-service/src/main/java/com/campushub/support/security/CustomUserDetails.java

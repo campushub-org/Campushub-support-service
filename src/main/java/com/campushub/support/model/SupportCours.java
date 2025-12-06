@@ -27,6 +27,11 @@ public class SupportCours {
     @Column(nullable = false)
     private String fichierUrl;
 
+    @Enumerated(EnumType.STRING)
+    private Niveau niveau;
+
+    private String matiere;
+
     @Column(nullable = false)
     private Long enseignantId;
 
