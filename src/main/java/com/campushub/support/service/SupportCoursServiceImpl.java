@@ -129,7 +129,20 @@ public class SupportCoursServiceImpl implements SupportCoursService {
         support.setStatut(Statut.VALIDÉ);
         support.setDateValidation(LocalDate.now());
         support.setRemarqueDoyen(remarque);
-        return supportCoursRepository.save(support);
+        SupportCours savedSupport = supportCoursRepository.save(support);
+
+        // Send notification
+        SupportNotification notification = new SupportNotification(
+                savedSupport.getId(),
+                savedSupport.getTitre(),
+                savedSupport.getEnseignantId(),
+                savedSupport.getStatut(),
+                savedSupport.getNiveau(),
+                savedSupport.getMatiere()
+        );
+        notificationProducer.sendNotification(notification);
+
+        return savedSupport;
     }
 
     @Override
@@ -138,7 +151,20 @@ public class SupportCoursServiceImpl implements SupportCoursService {
                 .orElseThrow(() -> new RuntimeException("Support de cours non trouvé"));
         support.setStatut(Statut.REJETÉ);
         support.setRemarqueDoyen(remarque);
-        return supportCoursRepository.save(support);
+        SupportCours savedSupport = supportCoursRepository.save(support);
+
+        // Send notification
+        SupportNotification notification = new SupportNotification(
+                savedSupport.getId(),
+                savedSupport.getTitre(),
+                savedSupport.getEnseignantId(),
+                savedSupport.getStatut(),
+                savedSupport.getNiveau(),
+                savedSupport.getMatiere()
+        );
+        notificationProducer.sendNotification(notification);
+
+        return savedSupport;
     }
 
     @Override
