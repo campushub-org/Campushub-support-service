@@ -73,7 +73,7 @@ public class SupportCoursController {
 
     // Endpoint for a teacher to get their own supports
     @GetMapping("/enseignant/{enseignantId}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_TEACHER') or hasAuthority('ROLE_ADMIN')")
     public List<SupportCoursDto> getSupportsByEnseignant(@PathVariable Long enseignantId) {
         return supportCoursService.getSupportsByEnseignant(enseignantId).stream()
                 .map(this::convertToDto)
