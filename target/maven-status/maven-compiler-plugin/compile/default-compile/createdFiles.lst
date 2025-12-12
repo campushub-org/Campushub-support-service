@@ -1,5 +1,7 @@
+com/campushub/support/client/UserServiceClient.class
 com/campushub/support/security/JwtService.class
 com/campushub/support/service/SupportCoursService.class
+com/campushub/support/client/UserDto.class
 com/campushub/support/config/RabbitMQConfig.class
 com/campushub/support/service/SupportCoursServiceImpl.class
 com/campushub/support/controller/SupportCoursController.class
@@ -11,6 +13,9 @@ com/campushub/support/CampushubSupportServiceApplication.class
 com/campushub/support/model/Niveau.class
 com/campushub/support/dto/CreateSupportCoursDto.class
 com/campushub/support/service/NotificationProducer.class
+com/campushub/support/config/WebClientConfig.class
+com/campushub/support/config/AppConfig.class
+com/campushub/support/client/UserServiceClient$1.class
 com/campushub/support/model/Statut.class
 com/campushub/support/model/SupportCours.class
 com/campushub/support/repository/SupportCoursRepository.class

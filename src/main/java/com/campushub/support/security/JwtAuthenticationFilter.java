@@ -44,7 +44,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userId,
                         username,
                         "", // Password is not needed/available in resource server JWT validation
-                        jwtService.getAuthoritiesFromJWT(jwt)
+                        jwtService.getAuthoritiesFromJWT(jwt),
+                        jwt
                 );
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

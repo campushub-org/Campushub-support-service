@@ -1,4 +1,6 @@
 package com.campushub.support.service;
+import com.campushub.support.client.UserDto;
+import com.campushub.support.client.UserServiceClient;
 import com.campushub.support.dto.SupportNotification;
 import com.campushub.support.security.CustomUserDetails;
 import com.campushub.support.model.Niveau;
@@ -12,8 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SupportCoursServiceImpl implements SupportCoursService {
@@ -22,11 +26,13 @@ public class SupportCoursServiceImpl implements SupportCoursService {
 
     private final SupportCoursRepository supportCoursRepository;
     private final NotificationProducer notificationProducer;
+    private final UserServiceClient userServiceClient; // Inject UserServiceClient
 
     @Autowired
-    public SupportCoursServiceImpl(SupportCoursRepository supportCoursRepository, NotificationProducer notificationProducer) {
+    public SupportCoursServiceImpl(SupportCoursRepository supportCoursRepository, NotificationProducer notificationProducer, UserServiceClient userServiceClient) {
         this.supportCoursRepository = supportCoursRepository;
         this.notificationProducer = notificationProducer;
+        this.userServiceClient = userServiceClient;
     }
 
     @Override
@@ -39,7 +45,6 @@ public class SupportCoursServiceImpl implements SupportCoursService {
             logger.info("Authenticated user authorities: {}", ((CustomUserDetails) principal).getAuthorities());
         } else {
             logger.warn("Principal is not CustomUserDetails: {}", principal.getClass().getName());
-            // Fallback for tests or other authentication types
             throw new RuntimeException("Authenticated user is not of type CustomUserDetails.");
         }
 
@@ -53,13 +58,15 @@ public class SupportCoursServiceImpl implements SupportCoursService {
         support.setFichierUrl(fichierUrl);
         support.setNiveau(niveau);
         support.setMatiere(matiere);
-        support.setEnseignantId(enseignantId); // Set from authenticated user
+        support.setEnseignantId(enseignantId);
         SupportCours savedSupport = supportCoursRepository.save(support);
 
-        // Send notification
+        // Send notification to the teacher who created the support
+        List<Long> recipientUserIds = Collections.singletonList(enseignantId);
         SupportNotification notification = new SupportNotification(
                 savedSupport.getId(),
                 savedSupport.getTitre(),
+                recipientUserIds, // Use the list of recipient IDs
                 savedSupport.getEnseignantId(),
                 savedSupport.getStatut(),
                 savedSupport.getNiveau(),
@@ -97,7 +104,6 @@ public class SupportCoursServiceImpl implements SupportCoursService {
         support.setTitre(titre);
         support.setDescription(description);
         support.setFichierUrl(fichierUrl);
-        // Ensure that the enseignantId is not changed during an update, only set at creation
         return supportCoursRepository.save(support);
     }
 
@@ -108,10 +114,31 @@ public class SupportCoursServiceImpl implements SupportCoursService {
         support.setStatut(Statut.SOUMIS);
         SupportCours savedSupport = supportCoursRepository.save(support);
 
-        // Send notification
+        // Send notification to the teacher and deans of the department
+        List<Long> recipientUserIds;
+        try {
+            String token = getJwtFromSecurityContext();
+            UserDto teacher = userServiceClient.getUserById(savedSupport.getEnseignantId(), token);
+            String department = teacher.getDepartment();
+            List<UserDto> usersInDepartment = userServiceClient.getUsersByDepartment(department, token);
+
+            recipientUserIds = usersInDepartment.stream()
+                    .filter(user -> "DEAN".equals(user.getRole()))
+                    .map(UserDto::getId)
+                    .collect(Collectors.toList());
+            if (!recipientUserIds.contains(savedSupport.getEnseignantId())) {
+                 recipientUserIds.add(savedSupport.getEnseignantId());
+            }
+
+        } catch (Exception e) {
+            logger.error("Error fetching users for notification in submitSupport: {}", e.getMessage());
+            recipientUserIds = Collections.singletonList(savedSupport.getEnseignantId()); // Fallback to notifying only the teacher
+        }
+
         SupportNotification notification = new SupportNotification(
                 savedSupport.getId(),
                 savedSupport.getTitre(),
+                recipientUserIds, // Use the list of recipient IDs
                 savedSupport.getEnseignantId(),
                 savedSupport.getStatut(),
                 savedSupport.getNiveau(),
@@ -131,10 +158,26 @@ public class SupportCoursServiceImpl implements SupportCoursService {
         support.setRemarqueDoyen(remarque);
         SupportCours savedSupport = supportCoursRepository.save(support);
 
-        // Send notification
+        // Send notification to all users in the department
+        List<Long> recipientUserIds;
+        try {
+            String token = getJwtFromSecurityContext();
+            UserDto teacher = userServiceClient.getUserById(savedSupport.getEnseignantId(), token);
+            String department = teacher.getDepartment();
+            List<UserDto> usersInDepartment = userServiceClient.getUsersByDepartment(department, token);
+
+            recipientUserIds = usersInDepartment.stream()
+                    .map(UserDto::getId)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            logger.error("Error fetching users for notification in validateSupport: {}", e.getMessage());
+            recipientUserIds = Collections.singletonList(savedSupport.getEnseignantId()); // Fallback to notifying only the teacher
+        }
+
         SupportNotification notification = new SupportNotification(
                 savedSupport.getId(),
                 savedSupport.getTitre(),
+                recipientUserIds, // Use the list of recipient IDs
                 savedSupport.getEnseignantId(),
                 savedSupport.getStatut(),
                 savedSupport.getNiveau(),
@@ -153,10 +196,30 @@ public class SupportCoursServiceImpl implements SupportCoursService {
         support.setRemarqueDoyen(remarque);
         SupportCours savedSupport = supportCoursRepository.save(support);
 
-        // Send notification
+        // Send notification to the teacher and deans of the department
+        List<Long> recipientUserIds;
+        try {
+            String token = getJwtFromSecurityContext();
+            UserDto teacher = userServiceClient.getUserById(savedSupport.getEnseignantId(), token);
+            String department = teacher.getDepartment();
+            List<UserDto> usersInDepartment = userServiceClient.getUsersByDepartment(department, token);
+
+            recipientUserIds = usersInDepartment.stream()
+                    .filter(user -> "DEAN".equals(user.getRole()))
+                    .map(UserDto::getId)
+                    .collect(Collectors.toList());
+            if (!recipientUserIds.contains(savedSupport.getEnseignantId())) {
+                recipientUserIds.add(savedSupport.getEnseignantId());
+            }
+        } catch (Exception e) {
+            logger.error("Error fetching users for notification in rejectSupport: {}", e.getMessage());
+            recipientUserIds = Collections.singletonList(savedSupport.getEnseignantId()); // Fallback
+        }
+        
         SupportNotification notification = new SupportNotification(
                 savedSupport.getId(),
                 savedSupport.getTitre(),
+                recipientUserIds,
                 savedSupport.getEnseignantId(),
                 savedSupport.getStatut(),
                 savedSupport.getNiveau(),
@@ -170,5 +233,13 @@ public class SupportCoursServiceImpl implements SupportCoursService {
     @Override
     public void deleteSupport(Long id) {
         supportCoursRepository.deleteById(id);
+    }
+
+    private String getJwtFromSecurityContext() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            return ((CustomUserDetails) principal).getToken();
+        }
+        throw new RuntimeException("Could not retrieve JWT token from SecurityContext.");
     }
 }

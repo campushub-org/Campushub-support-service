@@ -25,7 +25,8 @@ public class WithMockCustomUserFactory implements WithSecurityContextFactory<Wit
                 customUser.id(),
                 customUser.username(),
                 "password", // Password is not used in resource server context
-                grantedAuthorities
+                grantedAuthorities,
+                "mock-jwt-token" // Pass a mock token for tests
         );
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(

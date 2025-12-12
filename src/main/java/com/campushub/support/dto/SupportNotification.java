@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List; // Import List
 
 @Data
 @NoArgsConstructor
@@ -14,7 +15,8 @@ import java.io.Serializable;
 public class SupportNotification implements Serializable {
     private Long supportId;
     private String titre;
-    private Long enseignantId;
+    private List<Long> recipientUserIds; // Changed from single enseignantId to a list of recipientUserIds
+    private Long enseignantId; // Added enseignantId
     private Statut statut;
     private Niveau niveau;
     private String matiere;

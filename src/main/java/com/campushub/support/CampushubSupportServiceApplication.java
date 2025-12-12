@@ -14,8 +14,4 @@ public class CampushubSupportServiceApplication {
         SpringApplication.run(CampushubSupportServiceApplication.class, args);
     }
 
-    @Bean
-    public WebClient.Builder webClientBuilder() {
-        return WebClient.builder();
-    }
 }
