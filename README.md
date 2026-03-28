@@ -1,188 +1,74 @@
-# campushub-support-service - Service de Gestion des Supports de Cours
+# 📚 CampusHub - Support Service
 
-Ce service est responsable de la gestion du cycle de vie des supports de cours (documents PDF, PPT, etc.) déposés par les enseignants.
+[![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=java&logoColor=white)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2.5-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)](https://www.rabbitmq.com/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 
-### Fonctionnalités
-
-*   **Gestion des supports de cours** : Permet aux enseignants de créer, mettre à jour et supprimer leurs supports de cours (à l'état de brouillon). Inclut désormais les attributs `niveau` (L1, L2, L3, M1, M2) et `matiere`.
-*   **Workflow de validation** : Gère le cycle de vie d'un support (brouillon, soumis, validé, rejeté) via des endpoints dédiés.
-*   **Communication Inter-Services** : 
-    *   Communique avec `campushub-user-service` pour valider l'identité des enseignants.
-    *   Publie des événements (ex: `support.submitted`) sur RabbitMQ pour une communication asynchrone avec d'autres services (notifications, etc.).
-*   **Intégration Eureka** : S'enregistre auprès de `campushub-registry`.
-*   **Configuration centralisée** : Obtient sa configuration de `campushub-config`.
-*   **Persistance des données** : Utilise une base de données MySQL dédiée (`campushub-support-db`).
-
-### Commandes Utiles
-
-#### Construire le service (localement, sans Docker)
-
-```bash
-cd campushub-deployment/campushub-support-service
-./mvnw clean install -DskipTests
-```
-
-#### Exécuter le service (localement, sans Docker)
-
-```bash
-cd campushub-deployment/campushub-support-service
-java -jar target/campushub-support-service-0.0.1-SNAPSHOT.jar
-```
-Le service sera accessible sur le port défini dans sa configuration (par défaut 8083).
-
-#### Construire et exécuter avec Docker Compose
-
-Pour que Docker puisse construire l'image correctement, le fichier JAR de l'application doit être construit *au préalable* sur votre machine locale.
-
-1.  **Construire le JAR de l'application :**
-    ```bash
-    cd campushub-deployment/campushub-support-service
-    ./mvnw install -DskipTests
-    ```
-    Cette commande va compiler le code et générer le fichier `campushub-support-service-0.0.1-SNAPSHOT.jar` dans le répertoire `target/`.
-
-2.  **Construire l'image Docker et démarrer le service :**
-    ```bash
-    # Depuis le répertoire campushub-deployment/
-    docker compose build campushub-support-service
-    docker compose up -d campushub-support-service
-    ```
-### Endpoints de l'API
-
-**Note importante :** Les exemples ci-dessous supposent que le `campushub-gateway-service` est en cours d'exécution sur `http://localhost:8080` et qu'il route les requêtes avec le préfixe `/campushub-support-service` vers ce service.
+> Le **Support Service** orchestre le cycle de vie du matériel pédagogique au sein de CampusHub. De la mise en ligne par l'enseignant à la validation par le doyen, il assure la cohérence et la disponibilité des ressources académiques.
 
 ---
 
-#### 1. Créer un support de cours (Enseignant)
+## 🚀 Fonctionnalités Clés
 
-- **Méthode :** `POST`
-- **Path :** `/api/supports`
-- **Permissions :** `ROLE_TEACHER`
-- **Description :** Crée un nouveau support de cours. L'ID de l'enseignant est automatiquement déduit du token d'authentification. Inclut désormais les champs `niveau` et `matiere`.
-
-**Exemple `curl`:**
-```bash
-# Remplacez YOUR_TEACHER_JWT_TOKEN par un token valide d'enseignant
-curl --location 'http://localhost:8080/campushub-support-service/api/supports' \
---header 'Content-Type: application/json' \
---header 'Authorization: Bearer YOUR_TEACHER_JWT_TOKEN' \
---data-raw 
-{
-    "titre": "Introduction à la Physique Quantique",
-    "description": "Chapitre 1 du cours de Physique Moderne.",
-    "fichierUrl": "http://example.com/cours/physique_chap1.pdf",
-    "niveau": "M1",
-    "matiere": "Physique Quantique"
-}
-```
+- **Gestion de Catalogue** : CRUD complet sur les supports de cours (PDF).
+- **Workflow de Validation** : Système d'états (Brouillon, Soumis, Validé, Rejeté) avec retours pédagogiques du Doyen.
+- **Messagerie Asynchrone** : Notification automatique des changements d'états via RabbitMQ.
+- **Filtrage Intelligent** : Accès segmenté par département, niveau (L1-M2) et matière.
+- **Intégration Cloudinary** : Gestion sécurisée du stockage des fichiers.
 
 ---
 
-#### 2. Soumettre un support pour validation (Enseignant)
+## 🧬 Intégration avec les Notifications
 
-- **Méthode :** `POST`
-- **Path :** `/api/supports/{id}/submit`
-- **Permissions :** Propriétaire du support & `ROLE_TEACHER`
-- **Description :** Change le statut du support de `BROUILLON` à `SOUMIS` et envoie un événement pour notifier le doyen.
-
-**Exemple `curl`:**
-```bash
-curl --location --request POST 'http://localhost:8080/campushub-support-service/api/supports/1/submit' \
---header 'Authorization: Bearer YOUR_TEACHER_JWT_TOKEN'
-```
+Ce service agit comme un **producteur d'événements**. À chaque changement de statut d'un support, un message est publié sur l'exchange RabbitMQ.
+- **Exchange** : `support_exchange`
+- **Routing Key** : `support.notification`
+- **Impact** : Déclenche une alerte temps réel chez l'utilisateur concerné via le service de notification.
 
 ---
 
-#### 3. Valider un support (Doyen / Admin)
+## 🛠️ Stack Technique
 
-- **Méthode :** `POST`
-- **Path :** `/api/supports/{id}/validate`
-- **Permissions :** `ROLE_DEAN` ou `ROLE_ADMIN`
-- **Description :** Change le statut à `VALIDÉ`.
-
-**Exemple `curl`:**
-```bash
-# Remplacez YOUR_DEAN_JWT_TOKEN par un token valide de doyen/admin
-curl --location --request POST 'http://localhost:8080/campushub-support-service/api/supports/1/validate' \
---header 'Authorization: Bearer YOUR_DEAN_JWT_TOKEN' \
---header 'Content-Type: text/plain' \
---data-raw 'Excellent travail.'
-```
+- **Core :** Spring Boot 3.2.5
+- **Messaging :** Spring AMQP (RabbitMQ)
+- **Persistence :** Spring Data JPA
+- **Base de données :** MySQL 8.0
+- **Cloud Storage :** Intégration API Cloudinary
 
 ---
 
-#### 4. Rejeter un support (Doyen / Admin)
+## 📡 API Endpoints Principaux
 
-- **Méthode :** `POST`
-- **Path :** `/api/supports/{id}/reject`
-- **Permissions :** `ROLE_DEAN` ou `ROLE_ADMIN`
-- **Description :** Change le statut à `REJETÉ`.
-
-**Exemple `curl`:**
-```bash
-curl --location --request POST 'http://localhost:8080/campushub-support-service/api/supports/1/reject' \
---header 'Authorization: Bearer YOUR_DEAN_JWT_TOKEN' \
---header 'Content-Type: text/plain' \
---data-raw 'Veuillez corriger la section 2.3.'
-```
+| Méthode | Path | Description | Accès |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/supports` | Liste des supports validés | Étudiant / Tous |
+| `POST` | `/api/supports` | Dépôt d'un nouveau support | Enseignant |
+| `GET` | `/api/supports/enseignant/:id` | Supports personnels de l'enseignant | Enseignant |
+| `POST` | `/api/supports/:id/validate` | Validation académique du support | Doyen |
+| `POST` | `/api/supports/:id/reject` | Rejet avec remarque motivée | Doyen |
 
 ---
 
-#### 5. Lister les supports en attente (Doyen / Admin)
+## ⚙️ Configuration & Démarrage
 
-- **Méthode :** `GET`
-- **Path :** `/api/supports/pending`
-- **Permissions :** `ROLE_DEAN` ou `ROLE_ADMIN`
-- **Description :** Récupère la liste de tous les supports avec le statut `SOUMIS`.
+### Build du package (Crucial)
+Comme le `Dockerfile` utilise le fichier `.jar` généré localement, vous devez compiler le projet avant de build l'image Docker :
 
-**Exemple `curl`:**
 ```bash
-curl --location 'http://localhost:8080/campushub-support-service/api/supports/pending' \
---header 'Authorization: Bearer YOUR_DEAN_JWT_TOKEN'
+# Générer le JAR en sautant les tests
+./mvnw clean package -DskipTests
+```
+
+### Lancement Local
+```bash
+./mvnw spring-boot:run
+```
+
+### Déploiement Docker
+```bash
+docker build -t campushub-support-service .
 ```
 
 ---
-
-#### 6. Supprimer un support (Propriétaire ou Admin)
-
-- **Méthode :** `DELETE`
-- **Path :** `/api/supports/{id}`
-- **Permissions :** Propriétaire du support ou `ADMIN`
-- **Description :** Supprime un support de cours (généralement s'il est encore à l'état de brouillon).
-
-**Exemple `curl`:**
-```bash
-curl --location --request DELETE 'http://localhost:8080/campushub-support-service/api/supports/1' \
---header 'Authorization: Bearer YOUR_TEACHER_JWT_TOKEN'
-```
-
----
-
-#### 7. Lister tous les supports de cours (Utilisateur Authentifié)
-
-- **Méthode :** `GET`
-- **Path :** `/api/supports`
-- **Permissions :** `isAuthenticated()`
-- **Description :** Récupère la liste de tous les supports de cours (probablement seulement les `VALIDÉ` dans une future version, mais pour l'instant tous).
-
-**Exemple `curl`:**
-```bash
-# Remplacez YOUR_JWT_TOKEN par un token valide (étudiant, enseignant, etc.)
-curl --location 'http://localhost:8080/campushub-support-service/api/supports' \
---header 'Authorization: Bearer YOUR_JWT_TOKEN'
-```
-
----
-
-#### 8. Récupérer un support de cours par ID (Utilisateur Authentifié)
-
-- **Méthode :** `GET`
-- **Path :** `/api/supports/{id}`
-- **Permissions :** `isAuthenticated()`
-
-**Exemple `curl`:**
-```bash
-# Remplacez YOUR_JWT_TOKEN par un token valide
-curl --location 'http://localhost:8080/campushub-support-service/api/supports/1' \
---header 'Authorization: Bearer YOUR_JWT_TOKEN'
-```
+<p align="center">Le savoir, accessible partout et à tout moment</p>
