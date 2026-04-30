@@ -1,5 +1,5 @@
-com/campushub/support/client/UserServiceClient.class
 com/campushub/support/security/JwtService.class
+com/campushub/support/client/UserServiceClient.class
 com/campushub/support/service/SupportCoursService.class
 com/campushub/support/client/UserDto.class
 com/campushub/support/config/RabbitMQConfig.class

@@ -83,7 +83,7 @@ curl --location 'http://localhost:8080/campushub-support-service/api/supports' \
 - **Méthode :** `POST`
 - **Path :** `/api/supports/{id}/submit`
 - **Permissions :** Propriétaire du support & `ROLE_TEACHER`
-- **Description :** Change le statut du support de `BROUILLON` à `SOUMIS` et envoie un événement pour notifier le doyen.
+- **Description :** Change le statut du support de `BROUILLON` à `SOUMIS` et envoie un événement pour notifier l'équipe Pédagogique.
 
 **Exemple `curl`:**
 ```bash

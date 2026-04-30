@@ -155,6 +155,7 @@ public class SupportCoursServiceImpl implements SupportCoursService {
                 .orElseThrow(() -> new RuntimeException("Support de cours non trouvé"));
         support.setStatut(Statut.VALIDÉ);
         support.setDateValidation(LocalDate.now());
+        support.addPersonneValide(id);
         support.setRemarqueDoyen(remarque);
         SupportCours savedSupport = supportCoursRepository.save(support);
 
@@ -193,6 +194,7 @@ public class SupportCoursServiceImpl implements SupportCoursService {
         SupportCours support = supportCoursRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Support de cours non trouvé"));
         support.setStatut(Statut.REJETÉ);
+        support.addPersonneReject(id);
         support.setRemarqueDoyen(remarque);
         SupportCours savedSupport = supportCoursRepository.save(support);
 
