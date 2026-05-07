@@ -1,21 +1,21 @@
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/security/CustomUserDetails.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/security/JwtService.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/CampushubSupportServiceApplication.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/security/JwtAuthenticationFilter.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/config/RabbitMQConfig.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/security/SecurityConfig.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/service/NotificationProducer.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/config/AppConfig.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/model/Niveau.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/client/UserServiceClient.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/repository/SupportCoursRepository.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/config/WebClientConfig.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/dto/SupportCoursDto.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/service/SupportCoursServiceImpl.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/model/Statut.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/dto/CreateSupportCoursDto.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/controller/SupportCoursController.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/dto/SupportNotification.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/model/SupportCours.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/client/UserDto.java
-/home/jason/Bureau/campus hub/Campushub-support-service/src/main/java/com/campushub/support/service/SupportCoursService.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/security/JwtService.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/security/CustomUserDetails.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/service/SupportCoursServiceImpl.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/dto/CreateSupportCoursDto.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/model/SupportCours.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/dto/SupportNotification.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/config/RabbitMQConfig.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/repository/SupportCoursRepository.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/service/NotificationProducer.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/client/UserServiceClient.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/controller/SupportCoursController.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/model/Statut.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/CampushubSupportServiceApplication.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/security/JwtAuthenticationFilter.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/dto/SupportCoursDto.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/config/AppConfig.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/model/Niveau.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/security/SecurityConfig.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/config/WebClientConfig.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/service/SupportCoursService.java
+/home/computer-science-team/Documents/campushub/Campushub-support-service/src/main/java/com/campushub/support/client/UserDto.java
