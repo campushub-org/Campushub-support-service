@@ -53,18 +53,19 @@ public class SupportCoursController {
         return new ResponseEntity<>(convertToDto(createdSupport), HttpStatus.CREATED);
     }
 
-    // Endpoint to get all supports, could be restricted
+    // Public read-only access for the guest "explore" mode on the landing page.
+    // Write/admin endpoints below remain restricted by role.
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("permitAll()")
     public List<SupportCoursDto> getAllSupports() {
         return supportCoursService.getAllSupports().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    // Endpoint to get a support by ID
+    // Public read-only access for the guest "explore" mode (course detail view).
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<SupportCoursDto> getSupportById(@PathVariable Long id) {
         return supportCoursService.getSupportById(id)
                 .map(support -> ResponseEntity.ok(convertToDto(support)))
